@@ -1,0 +1,52 @@
+QDialog
+{
+  background-color: #444444;
+}
+
+QCheckBox
+{
+  color: #e1e1e1;
+}
+
+QCheckBox:indicator:checked
+{
+  background-color: #c8c8c8;
+}
+
+QCheckBox:indicator:checked:hover
+{
+  border: 1px solid #1a1a1a;
+}
+
+QCheckBox:indicator:unchecked
+{
+  background-color: #2a2a2a;
+}
+
+QCheckBox:indicator:unchecked:hover
+{
+  border: 1px solid #c8c8c8;
+}
+
+QLabel
+{
+  color: #e1e1e1;
+}
+
+QLineEdit
+{
+  color: #e1e1e1;
+  background-color: #2b2b2b;
+}
+
+QLineEdit:disabled
+{
+  color: #959595;
+  background-color: #404040;
+}
+
+QPushButton
+{
+  color: #e1e1e1;
+  background-color: #5d5d5d;
+}
