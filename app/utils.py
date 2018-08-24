@@ -9,7 +9,7 @@ def get_file_text(path):
 
     contents = ""
 
-    with open(path) as f:
-        contents = ''.join(line.rstrip() for line in f)
+    with open(path) as open_file:
+        contents = ''.join(line.rstrip() for line in open_file)
 
     return contents

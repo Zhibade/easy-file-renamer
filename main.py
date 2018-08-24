@@ -12,6 +12,7 @@ from PySide2.QtWidgets import QApplication
 
 from app.ui.main_gui import GUI
 
+
 __appname__ = "Easy File Renamer"
 __module__ = "main"
 
@@ -20,6 +21,7 @@ __copyright__ = "Copyright 2018"
 __license__ = "MIT"
 __version__ = "1.0.0"
 __email__ = "lopezromo.jose@gmail.com"
+
 
 if __name__ == "__main__":
     QCoreApplication.setApplicationName("EasyFileRenamer")
