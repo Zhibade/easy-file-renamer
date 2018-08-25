@@ -2,8 +2,10 @@
 Module containing main GUI for the application
 """
 
+import os
+
 from PySide2.QtCore import QSettings
-from PySide2.QtWidgets import QDialog
+from PySide2.QtWidgets import QDialog, QFileDialog, QMessageBox
 
 from app.ui.ui_main_dialog import UIMainDialog
 from app.utils import ini_str_to_bool
@@ -47,6 +49,32 @@ class GUI(QDialog, UIMainDialog):
         self.update_line_edits()
 
 
+    def browse_path(self):
+        """
+        Displays directory browser and sets the path line edit
+        if a directory is chosen
+        """
+
+        path = QFileDialog.getExistingDirectory(caption="Select directory")
+
+        if path != "":
+            self.target_path_line_edit.setText(path)
+
+
+    def init_renaming(self):
+        """
+        Starts renaming process.
+        It checks the path before attempting to rename
+        """
+
+        is_valid_path = os.path.isdir(self.target_path_line_edit.text())
+
+        if not is_valid_path:
+            QMessageBox.warning(self, "EasyFileRenamer - Warning",
+                                "Invalid directory specified. Please select an existing directory")
+            return
+
+
     def init_signals(self):
         """Connects widgets' signals to their callbacks"""
 
@@ -56,6 +84,9 @@ class GUI(QDialog, UIMainDialog):
         self.suff_chk.stateChanged.connect(self.update_line_edits)
         self.ext_chk.stateChanged.connect(self.update_line_edits)
         self.rename_chk.stateChanged.connect(self.update_line_edits)
+
+        self.browse_path_btn.clicked.connect(self.browse_path)
+        self.rename_files_btn.clicked.connect(self.init_renaming)
 
 
     def load_settings(self):
