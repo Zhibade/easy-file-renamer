@@ -9,7 +9,29 @@ from unittest.mock import patch
 from app import utils
 
 
+class TestIniStrToBool(TestCase):
+    """Test cases for ini_str_to_bool utility"""
+
+    def setUpClass():
+        print("\nTesting utils -> ini_str_to_bool() tests\n")
+
+
+    def test_true(self):
+        """ini_str_to_bool should return True if 'true' is passed"""
+
+        value = utils.ini_str_to_bool("true")
+        self.assertEqual(True, value)
+
+
+    def test_false(self):
+        """ini_str_to_bool should return False if 'false' is passed"""
+
+        value = utils.ini_str_to_bool("false")
+        self.assertEqual(False, value)
+
+
 class TestGetFileText(TestCase):
+    """Test cases for get_file_text utility"""
 
     FILE_PATH = "path/to/file.css"
     FILE_CONTENTS = "line1\nline2\n"
