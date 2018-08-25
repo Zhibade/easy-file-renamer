@@ -13,7 +13,7 @@ class TestIniStrToBool(TestCase):
     """Test cases for ini_str_to_bool utility"""
 
     def setUpClass():
-        print("\nTesting utils -> ini_str_to_bool() tests\n")
+        print("\nTesting utils -> ini_str_to_bool()\n")
 
 
     def test_true(self):
@@ -37,7 +37,7 @@ class TestGetFileText(TestCase):
     FILE_CONTENTS = "line1\nline2\n"
 
     def setUpClass():
-        print("\nTesting utils -> get_file_text() tests\n")
+        print("\nTesting utils -> get_file_text()\n")
 
 
     def setUp(self):

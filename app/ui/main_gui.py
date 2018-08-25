@@ -10,6 +10,7 @@ from app.utils import ini_str_to_bool
 
 
 # Constants
+
 SETTING_ADD_PREFIX = 'add_prefix'
 SETTING_ADD_PREFIX_DEFAULT = False
 
@@ -43,12 +44,18 @@ class GUI(QDialog, UIMainDialog):
 
         self.init_signals()
         self.load_settings()
+        self.update_line_edits()
 
 
     def init_signals(self):
         """Connects widgets' signals to their callbacks"""
 
         self.finished.connect(self.save_settings)
+
+        self.prefix_chk.stateChanged.connect(self.update_line_edits)
+        self.suff_chk.stateChanged.connect(self.update_line_edits)
+        self.ext_chk.stateChanged.connect(self.update_line_edits)
+        self.rename_chk.stateChanged.connect(self.update_line_edits)
 
 
     def load_settings(self):
@@ -75,3 +82,13 @@ class GUI(QDialog, UIMainDialog):
         self.settings.setValue(SETTING_CHANGE_EXT, self.ext_chk.isChecked())
         self.settings.setValue(SETTING_INCLUDE_SUBDIR, self.include_subdir_chk.isChecked())
         self.settings.setValue(SETTING_RENAME, self.rename_chk.isChecked())
+
+
+    def update_line_edits(self):
+        """Updates line edits based on their corresponding checkboxes values"""
+
+        self.prefix_line_edit.setEnabled(self.prefix_chk.isChecked())
+        self.suff_line_edit.setEnabled(self.suff_chk.isChecked())
+        self.ext_line_edit.setEnabled(self.ext_chk.isChecked())
+        self.rename_old_line_edit.setEnabled(self.rename_chk.isChecked())
+        self.rename_new_line_edit.setEnabled(self.rename_chk.isChecked())
