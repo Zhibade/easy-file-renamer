@@ -7,6 +7,7 @@ import os
 from PySide2.QtCore import QSettings
 from PySide2.QtWidgets import QDialog, QFileDialog, QMessageBox
 
+from app.lib.renaming import FileRenameWorker
 from app.ui.ui_main_dialog import UIMainDialog
 from app.utils import ini_str_to_bool
 
@@ -39,6 +40,7 @@ class GUI(QDialog, UIMainDialog):
     def __init__(self, parent=None):
         super(GUI, self).__init__(parent)
         self.setup_ui(self)
+        self.file_renamer_worker = None
         self.settings = QSettings(QSettings.IniFormat,
                                   QSettings.UserScope,
                                   SETTINGS_LABEL,
@@ -67,12 +69,24 @@ class GUI(QDialog, UIMainDialog):
         It checks the path before attempting to rename
         """
 
-        is_valid_path = os.path.isdir(self.target_path_line_edit.text())
+        path = self.target_path_line_edit.text()
+        is_valid_path = os.path.isdir(path)
 
         if not is_valid_path:
             QMessageBox.warning(self, "EasyFileRenamer - Warning",
                                 "Invalid directory specified. Please select an existing directory")
             return
+
+        should_rename = self.rename_chk.isChecked()
+        old_name = self.rename_old_line_edit.text()
+        new_name = self.rename_new_line_edit.text()
+
+        self.file_renamer_worker = FileRenameWorker(path, replace_name=should_rename,
+                                                    old_name=old_name, new_name=new_name)
+        self.file_renamer_worker.aborted.connect(self.renaming_aborted)
+        self.file_renamer_worker.finished.connect(self.renaming_finished)
+
+        self.file_renamer_worker.start()
 
 
     def init_signals(self):
@@ -103,6 +117,18 @@ class GUI(QDialog, UIMainDialog):
         self.ext_chk.setChecked(ini_str_to_bool(ext_value))
         self.include_subdir_chk.setChecked(ini_str_to_bool(subdir_value))
         self.rename_chk.setChecked(ini_str_to_bool(rename_value))
+
+
+    def renaming_aborted(self, error):
+        """Displays error message if renaming fails"""
+
+        QMessageBox.critical(self, "EasyFileRenamer - Error", error)
+
+
+    def renaming_finished(self):
+        """Updates UI and displays a message when renaming is finished"""
+
+        QMessageBox.information(self, "EasyFileRenamer - Success!", "Renamed files successfully!")
 
 
     def save_settings(self):

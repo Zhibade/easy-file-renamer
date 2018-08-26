@@ -3,6 +3,7 @@ Test cases for utils module
 """
 
 import io
+import os
 from unittest import TestCase
 from unittest.mock import patch
 
@@ -66,3 +67,49 @@ class TestGetFileText(TestCase):
         with patch('builtins.open', return_value=self.file_contents):
             return_contents = utils.get_file_text(self.FILE_PATH)
             self.assertIs(type(return_contents), str)
+
+
+class TestGetNewFileName(TestCase):
+    """Test cases for get_new_file_name utility"""
+
+    FILENAME = "SomeFile_Extra.txt"
+
+    def setUpClass():
+        print("\nTesting utils -> get_new_file_name()\n")
+
+
+    def test_rename(self):
+        """get_new_file_name should replace old_name with new_name"""
+
+        old_name = "SomeFile"
+        new_name = "neWNamE"
+
+        final_name = utils.get_new_file_name(self.FILENAME, old_name, new_name)
+
+        no_ext = os.path.splitext(self.FILENAME)
+        replaced_name = no_ext[0].replace(old_name, new_name)
+        expected_name = "{0}{1}".format(replaced_name, no_ext[1])
+
+        self.assertEqual(expected_name, final_name)
+
+
+    def test_rename_ext(self):
+        """get_new_file_name should not replace extension part of the filename"""
+
+        old_name = ".txt"
+        new_name = ".png"
+
+        final_name = utils.get_new_file_name(self.FILENAME, old_name, new_name)
+
+        self.assertEqual(self.FILENAME, final_name)
+
+
+    def test_no_match(self):
+        """get_new_file_name should not replace old_name with new_name if there is no match"""
+
+        old_name = "WhatName"
+        new_name = "neWNamE"
+
+        final_name = utils.get_new_file_name(self.FILENAME, old_name, new_name)
+
+        self.assertEqual(self.FILENAME, final_name)
