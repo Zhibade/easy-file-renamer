@@ -3,6 +3,7 @@ Generic utilities module
 """
 
 import os
+import random
 
 
 def ini_str_to_bool(value):
@@ -12,9 +13,7 @@ def ini_str_to_bool(value):
 
 
 def get_file_text(path):
-    """
-    Returns file contents as a single string
-    """
+    """Returns file contents as a single string"""
 
     contents = ""
 
@@ -24,15 +23,18 @@ def get_file_text(path):
     return contents
 
 
-def get_new_file_name(filename, old_name, new_name):
-    """
-    Returns the new file name by replacing old_name with new_name
-    filename should be the file name with extension only, without including directory
+def get_random_filename_in_dir(path):
+    """Returns the filename of a random file in the path"""
 
-    It ignores the extension part when replacing.
-    """
+    if not os.path.exists(path):
+        return ""
 
-    ext_split = os.path.splitext(filename)
-    new_name = ext_split[0].replace(old_name, new_name)
+    dir_elements = os.listdir(path)
 
-    return "{0}{1}".format(new_name, ext_split[1])
+    is_picking_file = True
+
+    while is_picking_file:
+        picked_file = random.choice(dir_elements)
+
+        if os.path.isfile(os.path.join(path, picked_file)):
+            return picked_file

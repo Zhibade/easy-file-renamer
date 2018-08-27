@@ -7,8 +7,6 @@ import os
 
 from PySide2.QtCore import QThread, Signal
 
-from app.utils import get_new_file_name
-
 
 class FileRenameWorker(QThread):
     """
@@ -64,3 +62,18 @@ def full_rename(filename, rename=False, old_name="", new_name=""):
         new_filename = get_new_file_name(new_filename, old_name, new_name)
 
     return new_filename
+
+
+def get_new_file_name(filename, old_name, new_name):
+    """
+    Returns the new file name by replacing old_name with new_name
+    filename should be the file name with extension only, without including directory
+
+    It ignores the extension part when replacing.
+    """
+
+    ext_split = os.path.splitext(filename)
+
+    new_name = ext_split[0].replace(old_name, new_name)
+
+    return "{0}{1}".format(new_name, ext_split[1])

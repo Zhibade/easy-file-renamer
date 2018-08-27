@@ -3,7 +3,7 @@ Test cases for utils module
 """
 
 import io
-import os
+
 from unittest import TestCase
 from unittest.mock import patch
 
@@ -69,47 +69,28 @@ class TestGetFileText(TestCase):
             self.assertIs(type(return_contents), str)
 
 
-class TestGetNewFileName(TestCase):
-    """Test cases for get_new_file_name utility"""
-
-    FILENAME = "SomeFile_Extra.txt"
+class TestGetRandomFilenameInDir(TestCase):
+    """Test cases for get_random_filename_in_dir utility"""
 
     def setUpClass():
-        print("\nTesting utils -> get_new_file_name()\n")
+        print("\nTesting utils -> get_random_filename_in_dir()\n")
 
 
-    def test_rename(self):
-        """get_new_file_name should replace old_name with new_name"""
+    def test_valid(self):
+        """get_random_filename_in_dir should return a filename with extension if path is valid"""
 
-        old_name = "SomeFile"
-        new_name = "neWNamE"
+        filename = "file.png"
 
-        final_name = utils.get_new_file_name(self.FILENAME, old_name, new_name)
-
-        no_ext = os.path.splitext(self.FILENAME)
-        replaced_name = no_ext[0].replace(old_name, new_name)
-        expected_name = "{0}{1}".format(replaced_name, no_ext[1])
-
-        self.assertEqual(expected_name, final_name)
+        with patch('os.path.exists', return_value=True):
+            with patch('os.listdir', return_value=[filename, filename]):
+                with patch('os.path.isfile', return_value=True):
+                    value = utils.get_random_filename_in_dir("some/path")
+                    self.assertEqual(filename, value)
 
 
-    def test_rename_ext(self):
-        """get_new_file_name should not replace extension part of the filename"""
+    def test_invalid(self):
+        """get_random_filename_in_dir should return an empty string if path is invalid"""
 
-        old_name = ".txt"
-        new_name = ".png"
-
-        final_name = utils.get_new_file_name(self.FILENAME, old_name, new_name)
-
-        self.assertEqual(self.FILENAME, final_name)
-
-
-    def test_no_match(self):
-        """get_new_file_name should not replace old_name with new_name if there is no match"""
-
-        old_name = "WhatName"
-        new_name = "neWNamE"
-
-        final_name = utils.get_new_file_name(self.FILENAME, old_name, new_name)
-
-        self.assertEqual(self.FILENAME, final_name)
+        with patch('os.path.exists', return_value=False):
+            value = utils.get_random_filename_in_dir("some/path")
+            self.assertEqual("", value)
