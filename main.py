@@ -5,12 +5,14 @@ multiple files easily.
 Small Qt application made for learning purposes
 """
 
+import logging
 import sys
 
 from PySide2.QtCore import QCoreApplication
 from PySide2.QtWidgets import QApplication
 
 from app.ui.main_gui import GUI
+from app.constants import LOG_FILE_PATH
 
 
 __appname__ = "Easy File Renamer"
@@ -24,6 +26,9 @@ __email__ = "lopezromo.jose@gmail.com"
 
 
 if __name__ == "__main__":
+    logging.basicConfig(handlers=[logging.FileHandler(LOG_FILE_PATH, mode='w', encoding='utf-8')],
+                        level=logging.INFO, format="%(asctime)s -- %(levelname)s -- %(message)s")
+
     QCoreApplication.setApplicationName("EasyFileRenamer")
     QCoreApplication.setApplicationVersion("1.0")
     QCoreApplication.setOrganizationName("EasyFileRenamer")

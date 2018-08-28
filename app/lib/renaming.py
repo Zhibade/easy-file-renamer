@@ -3,6 +3,7 @@ Module containing the logic for all
 file renaming of the application
 """
 
+import logging
 import os
 
 from PySide2.QtCore import QThread, Signal
@@ -32,6 +33,8 @@ class FileRenameWorker(QThread):
 
         try:
             norm_path = os.path.normpath(self.path)
+            logging.info("Starting renaming on path: %s", norm_path)
+
             all_in_dir = os.listdir(norm_path)
 
             for dir_element in all_in_dir:
@@ -44,8 +47,13 @@ class FileRenameWorker(QThread):
 
                     os.rename(full_path, os.path.join(norm_path, final_name))
 
+                    logging.info("Renamed %s to %s", dir_element, final_name)
+
         except OSError as error:
+            logging.error("An error occurred while renaming: %s", error)
             self.aborted.emit(str(error))
+
+        logging.info("End of renaming")
 
 
 def full_rename(filename, rename=False, old_name="", new_name=""):

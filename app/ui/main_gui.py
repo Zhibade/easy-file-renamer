@@ -10,6 +10,7 @@ from PySide2.QtWidgets import QDialog, QFileDialog, QMessageBox
 from app.lib.renaming import FileRenameWorker, get_preview_file_name
 from app.ui.ui_main_dialog import UIMainDialog
 from app.utils import ini_str_to_bool
+from app.constants import LOG_FILE_PATH
 
 
 # Constants
@@ -111,6 +112,7 @@ class GUI(QDialog, UIMainDialog):
 
         self.browse_path_btn.clicked.connect(self.browse_path)
         self.rename_files_btn.clicked.connect(self.init_renaming)
+        self.view_log_btn.clicked.connect(self.open_log_file)
 
         self.target_path_line_edit.textChanged.connect(lambda: self.update_preview_label(force_new=True))
         self.prefix_line_edit.textChanged.connect(lambda: self.update_preview_label())
@@ -133,6 +135,12 @@ class GUI(QDialog, UIMainDialog):
         self.ext_chk.setChecked(ini_str_to_bool(ext_value))
         self.include_subdir_chk.setChecked(ini_str_to_bool(subdir_value))
         self.rename_chk.setChecked(ini_str_to_bool(rename_value))
+
+
+    def open_log_file(self):
+        """Opens log file in the system's default application"""
+
+        os.startfile(LOG_FILE_PATH)
 
 
     def renaming_aborted(self, error):
