@@ -7,7 +7,7 @@ import os
 from PySide2.QtCore import QSettings
 from PySide2.QtWidgets import QDialog, QFileDialog, QMessageBox
 
-from app.lib.renaming import FileRenameWorker
+from app.lib.renaming import FileRenameWorker, get_preview_file_name
 from app.ui.ui_main_dialog import UIMainDialog
 from app.utils import ini_str_to_bool
 
@@ -102,6 +102,12 @@ class GUI(QDialog, UIMainDialog):
         self.browse_path_btn.clicked.connect(self.browse_path)
         self.rename_files_btn.clicked.connect(self.init_renaming)
 
+        self.target_path_line_edit.textChanged.connect(lambda: self.update_preview_label(force_new=True))
+        self.prefix_line_edit.textChanged.connect(lambda: self.update_preview_label())
+        self.suff_line_edit.textChanged.connect(lambda: self.update_preview_label())
+        self.rename_old_line_edit.textChanged.connect(lambda: self.update_preview_label())
+        self.rename_new_line_edit.textChanged.connect(lambda: self.update_preview_label())
+
 
     def load_settings(self):
         """Loads initial settings from INI file for the UI widgets"""
@@ -149,3 +155,18 @@ class GUI(QDialog, UIMainDialog):
         self.ext_line_edit.setEnabled(self.ext_chk.isChecked())
         self.rename_old_line_edit.setEnabled(self.rename_chk.isChecked())
         self.rename_new_line_edit.setEnabled(self.rename_chk.isChecked())
+
+
+    def update_preview_label(self, force_new=False):
+        """Updates preview file using the provided path and line edit values"""
+
+        path = self.target_path_line_edit.text()
+        should_rename = self.rename_chk.isChecked()
+        old_name = self.rename_old_line_edit.text()
+        new_name = self.rename_new_line_edit.text()
+
+        preview_filename = get_preview_file_name(path, rename=should_rename,
+                                                 old_name=old_name, new_name=new_name,
+                                                 get_new=force_new)
+
+        self.prev_file_name_label.setText(preview_filename)

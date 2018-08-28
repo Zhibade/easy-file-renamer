@@ -7,6 +7,8 @@ import os
 
 from PySide2.QtCore import QThread, Signal
 
+from app.utils import get_random_filename_in_dir
+
 
 class FileRenameWorker(QThread):
     """
@@ -77,3 +79,36 @@ def get_new_file_name(filename, old_name, new_name):
     new_name = ext_split[0].replace(old_name, new_name)
 
     return "{0}{1}".format(new_name, ext_split[1])
+
+
+cached_filename = ""
+def get_preview_file_name(path, rename=False, old_name="", new_name="", get_new=False):
+    """
+    Returns preview filename. When called for the first time it uses a random filename in
+    the provided path and cache it. Every time after that it will use the cached filename
+    unless [get_new] argument is set to True.
+
+    If path is invalid, it returns an empty string.
+
+    If there are no files in the provided path it returns "No files found"
+    """
+
+    global cached_filename
+
+    norm_path = os.path.normpath(path)
+
+    if not os.path.exists(norm_path):
+        return "Invalid directory"
+
+    if not get_new and cached_filename != "":
+        return full_rename(cached_filename, rename=rename, old_name=old_name, new_name=new_name)
+
+    rand_filename = get_random_filename_in_dir(norm_path)
+
+    if rand_filename is None:
+        return "No files found"
+
+    filename = full_rename(rand_filename, rename=rename, old_name=old_name, new_name=new_name)
+    cached_filename = filename
+
+    return filename
