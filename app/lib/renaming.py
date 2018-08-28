@@ -22,11 +22,17 @@ class FileRenameWorker(QThread):
 
     def __init__(self, path, parent=None,
                  add_prefix=False, prefix="",
+                 add_suffix=False, suffix="",
                  replace_name=False, old_name="", new_name=""):
         super(FileRenameWorker, self).__init__(parent)
         self.path = path
+
         self.add_prefix = add_prefix
         self.prefix = prefix
+
+        self.add_suffix = add_suffix
+        self.suffix = suffix
+
         self.old_name = old_name
         self.new_name = new_name
         self.rename = replace_name
@@ -48,6 +54,7 @@ class FileRenameWorker(QThread):
                     file_name = os.path.basename(full_path)
                     final_name = full_rename(file_name,
                                              add_prefix=self.add_prefix, prefix=self.prefix,
+                                             add_suffix=self.add_suffix, suffix=self.suffix,
                                              rename=self.rename, old_name=self.old_name, new_name=self.new_name)
 
                     os.rename(full_path, os.path.join(norm_path, final_name))
@@ -61,7 +68,9 @@ class FileRenameWorker(QThread):
         logging.info("End of renaming")
 
 
-def full_rename(filename, add_prefix=False, prefix="",
+def full_rename(filename,
+                add_prefix=False, prefix="",
+                add_suffix=False, suffix="",
                 rename=False, old_name="", new_name=""):
     """
     Does full renaming process (prefix, suffix, rename, extension)
@@ -77,6 +86,9 @@ def full_rename(filename, add_prefix=False, prefix="",
 
     if add_prefix:
         new_filename = get_file_name_with_prefix(new_filename, prefix)
+
+    if add_suffix:
+        new_filename = get_file_name_with_suffix(new_filename, suffix)
 
     return new_filename
 
@@ -106,8 +118,22 @@ def get_file_name_with_prefix(filename, prefix):
     return new_name
 
 
+def get_file_name_with_suffix(filename, suffix):
+    """
+    Returns the new file name by adding the provided suffix
+    """
+
+    ext_split = os.path.splitext(filename)
+
+    new_name = "{0}{1}{2}".format(ext_split[0], suffix, ext_split[1])
+
+    return new_name
+
+
 cached_filename = ""
-def get_preview_file_name(path, add_prefix=False, prefix="",
+def get_preview_file_name(path,
+                          add_prefix=False, prefix="",
+                          add_suffix=False, suffix="",
                           rename=False, old_name="", new_name="", get_new=False):
     """
     Returns preview filename. When called for the first time it uses a random filename in
@@ -129,6 +155,7 @@ def get_preview_file_name(path, add_prefix=False, prefix="",
     if not get_new and cached_filename != "":
         return full_rename(cached_filename,
                            add_prefix=add_prefix, prefix=prefix,
+                           add_suffix=add_suffix, suffix=suffix,
                            rename=rename, old_name=old_name, new_name=new_name)
 
     rand_filename = get_random_filename_in_dir(norm_path)
@@ -138,6 +165,7 @@ def get_preview_file_name(path, add_prefix=False, prefix="",
 
     filename = full_rename(rand_filename,
                            add_prefix=add_prefix, prefix=prefix,
+                           add_suffix=add_suffix, suffix=suffix,
                            rename=rename, old_name=old_name, new_name=new_name)
     cached_filename = filename
 

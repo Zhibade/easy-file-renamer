@@ -108,6 +108,36 @@ class TestGetFilenameWithPrefix(TestCase):
         self.assertIs(str, type(value))
 
 
+class TestGetFilenameWithSuffix(TestCase):
+    """Test cases for get_file_name_with_suffix function"""
+
+    SUFFIX = "_SUFF"
+    FILENAME = "TestFileNAME.txt"
+    FILENAME_SPLITEXT = ["TestFileNAME", ".txt"]
+
+    def setUpClass():
+        print("\nTesting renaming -> get_file_name_with_suffix()\n")
+
+
+    def test_prefix(self):
+        """get_file_name_with_suffix should return the provided filename with the suffix added"""
+
+        with patch('os.path.splitext', return_value=self.FILENAME_SPLITEXT):
+            value = renaming.get_file_name_with_suffix(self.FILENAME, self.SUFFIX)
+            expected = "{0}{1}{2}".format(self.FILENAME_SPLITEXT[0], self.SUFFIX,
+                                          self.FILENAME_SPLITEXT[1])
+
+        self.assertEqual(expected, value)
+
+
+    def test_type(self):
+        """get_file_name_with_suffix should return a string"""
+
+        with patch('os.path.splitext', return_value=self.FILENAME_SPLITEXT):
+            value = renaming.get_file_name_with_suffix(self.FILENAME, self.SUFFIX)
+            self.assertIs(str, type(value))
+
+
 class TestGetPreviewFilename(TestCase):
     """Test cases for get_preview_file_name function"""
 
