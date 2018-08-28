@@ -88,12 +88,16 @@ class GUI(QDialog, UIMainDialog):
 
         self.rename_files_btn.setEnabled(False)
 
+        should_add_prefix = self.prefix_chk.isChecked()
+        prefix = self.prefix_line_edit.text()
+
         should_rename = self.rename_chk.isChecked()
         old_name = self.rename_old_line_edit.text()
         new_name = self.rename_new_line_edit.text()
 
-        self.file_renamer_worker = FileRenameWorker(path, replace_name=should_rename,
-                                                    old_name=old_name, new_name=new_name)
+        self.file_renamer_worker = FileRenameWorker(path,
+                                                    add_prefix=should_add_prefix, prefix=prefix,
+                                                    replace_name=should_rename, old_name=old_name, new_name=new_name)
         self.file_renamer_worker.aborted.connect(self.renaming_aborted)
         self.file_renamer_worker.finished.connect(self.renaming_finished)
 
@@ -175,17 +179,24 @@ class GUI(QDialog, UIMainDialog):
         self.rename_old_line_edit.setEnabled(self.rename_chk.isChecked())
         self.rename_new_line_edit.setEnabled(self.rename_chk.isChecked())
 
+        self.update_preview_label()
+
 
     def update_preview_label(self, force_new=False):
         """Updates preview file using the provided path and line edit values"""
 
         path = self.target_path_line_edit.text()
+
+        should_add_prefix = self.prefix_chk.isChecked()
+        prefix = self.prefix_line_edit.text()
+
         should_rename = self.rename_chk.isChecked()
         old_name = self.rename_old_line_edit.text()
         new_name = self.rename_new_line_edit.text()
 
-        preview_filename = get_preview_file_name(path, rename=should_rename,
-                                                 old_name=old_name, new_name=new_name,
+        preview_filename = get_preview_file_name(path,
+                                                 add_prefix=should_add_prefix, prefix=prefix,
+                                                 rename=should_rename, old_name=old_name, new_name=new_name,
                                                  get_new=force_new)
 
         self.prev_file_name_label.setText(preview_filename)

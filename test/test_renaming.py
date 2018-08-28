@@ -82,6 +82,32 @@ class TestGetNewFileName(TestCase):
             self.assertEqual(self.FILENAME, final_name)
 
 
+class TestGetFilenameWithPrefix(TestCase):
+    """Test cases for get_file_name_with_prefix function"""
+
+    PREFIX = "PRE_"
+    FILENAME = "TestFileNAME.txt"
+
+    def setUpClass():
+        print("\nTesting renaming -> get_file_name_with_prefix()\n")
+
+
+    def test_prefix(self):
+        """get_file_name_with_prefix should return the provided filename with the prefix added"""
+
+        value = renaming.get_file_name_with_prefix(self.FILENAME, self.PREFIX)
+        expected = "{0}{1}".format(self.PREFIX, self.FILENAME)
+
+        self.assertEqual(expected, value)
+
+
+    def test_type(self):
+        """get_file_name_with_prefix should return a string"""
+
+        value = renaming.get_file_name_with_prefix(self.FILENAME, self.PREFIX)
+        self.assertIs(str, type(value))
+
+
 class TestGetPreviewFilename(TestCase):
     """Test cases for get_preview_file_name function"""
 
