@@ -15,8 +15,8 @@ class FileRenameWorker(QThread):
     Multi-threaded worker that handles all the
     file renaming process
     """
+
     aborted = Signal(str)
-    finished = Signal()
 
 
     def __init__(self, path, parent=None, replace_name=False, old_name="", new_name=""):
@@ -43,8 +43,6 @@ class FileRenameWorker(QThread):
                                              old_name=self.old_name, new_name=self.new_name)
 
                     os.rename(full_path, os.path.join(norm_path, final_name))
-
-            self.finished.emit()
 
         except OSError as error:
             self.aborted.emit(str(error))

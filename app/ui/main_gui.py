@@ -77,6 +77,16 @@ class GUI(QDialog, UIMainDialog):
                                 "Invalid directory specified. Please select an existing directory")
             return
 
+        proceed = QMessageBox.question(self, "EasyFileRenamer - Warning",
+                                       ("This operation cannot be undone."
+                                        "\n\nDo you wish to continue?"),
+                                       QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+
+        if proceed == QMessageBox.No:
+            return
+
+        self.rename_files_btn.setEnabled(False)
+
         should_rename = self.rename_chk.isChecked()
         old_name = self.rename_old_line_edit.text()
         new_name = self.rename_new_line_edit.text()
@@ -134,6 +144,7 @@ class GUI(QDialog, UIMainDialog):
     def renaming_finished(self):
         """Updates UI and displays a message when renaming is finished"""
 
+        self.rename_files_btn.setEnabled(True)
         QMessageBox.information(self, "EasyFileRenamer - Success!", "Renamed files successfully!")
 
 

@@ -104,6 +104,6 @@ class UIMainDialog():
         self.include_subdir_chk.setToolTip(QtWidgets.QApplication.translate("main_dialog", "If checked, it includes files in sub-folders", None, -1))
         self.include_subdir_chk.setText(QtWidgets.QApplication.translate("main_dialog", "Include subdirectories", None, -1))
         self.prev_file_name_title_label.setText(QtWidgets.QApplication.translate("main_dialog", "File name preview:", None, -1))
-        self.prev_file_name_label.setText(QtWidgets.QApplication.translate("main_dialog", "PREF_Name_SUFF.ext", None, -1))
+        self.prev_file_name_label.setText(QtWidgets.QApplication.translate("main_dialog", "Please input a directory", None, -1))
         self.rename_files_btn.setText(QtWidgets.QApplication.translate("main_dialog", "Rename Files", None, -1))
 
