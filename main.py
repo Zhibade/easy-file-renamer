@@ -26,13 +26,15 @@ __email__ = "lopezromo.jose@gmail.com"
 
 
 if __name__ == "__main__":
-    logging.basicConfig(handlers=[logging.FileHandler(LOG_FILE_PATH, mode='w', encoding='utf-8')],
+    logging.basicConfig(handlers=[logging.FileHandler(LOG_FILE_PATH, encoding='utf-8')],
                         level=logging.INFO, format="%(asctime)s -- %(levelname)s -- %(message)s")
 
     QCoreApplication.setApplicationName("EasyFileRenamer")
     QCoreApplication.setApplicationVersion("1.0")
     QCoreApplication.setOrganizationName("EasyFileRenamer")
     QCoreApplication.setOrganizationDomain("www.ivanlopezr.com")
+
+    logging.info("--- APPLICATION STARTED ---")
 
     QApplication.setStyle("fusion")
     app = QApplication(sys.argv)

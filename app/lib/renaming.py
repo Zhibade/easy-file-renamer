@@ -59,7 +59,7 @@ class FileRenameWorker(QThread):
 
                     os.rename(full_path, os.path.join(norm_path, final_name))
 
-                    logging.info("Renamed %s to %s", dir_element, final_name)
+                    logging.info("Renamed [%s] to [%s]", dir_element, final_name)
 
         except OSError as error:
             logging.error("An error occurred while renaming: %s", error)

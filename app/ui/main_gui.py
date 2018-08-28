@@ -2,6 +2,7 @@
 Module containing main GUI for the application
 """
 
+import logging
 import os
 
 from PySide2.QtCore import QSettings
@@ -112,6 +113,7 @@ class GUI(QDialog, UIMainDialog):
         """Connects widgets' signals to their callbacks"""
 
         self.finished.connect(self.save_settings)
+        self.finished.connect(lambda: logging.info("--- END OF APPLICATION ---"))
 
         self.prefix_chk.stateChanged.connect(self.update_line_edits)
         self.suff_chk.stateChanged.connect(self.update_line_edits)
