@@ -4,6 +4,8 @@ Quick and simple application for quickly renaming or adding suffix/prefix to mul
 
 Qt application using Python 3.7 and [Qt for Python / PySide 2](https://wiki.qt.io/Qt_for_Python)
 
+![Main Window](https://github.com/Zhibade/easy-file-renamer/blob/master/preview_image.png?raw=true)
+
 ## How to Run
 - `pip install pyside2`
 - `python main.py`
