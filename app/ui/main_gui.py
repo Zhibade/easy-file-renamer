@@ -126,6 +126,7 @@ class GUI(QDialog, UIMainDialog):
         self.suff_chk.stateChanged.connect(self.update_line_edits)
         self.ext_chk.stateChanged.connect(self.update_line_edits)
         self.rename_chk.stateChanged.connect(self.update_line_edits)
+        self.include_subdir_chk.stateChanged.connect(lambda: self.update_preview_label(force_new=True))
 
         self.browse_path_btn.clicked.connect(self.browse_path)
         self.rename_files_btn.clicked.connect(self.init_renaming)
