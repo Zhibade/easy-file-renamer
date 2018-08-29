@@ -138,6 +138,47 @@ class TestGetFilenameWithSuffix(TestCase):
             self.assertIs(str, type(value))
 
 
+class TestGetFilenameWithNewExt(TestCase):
+    """Test cases for get_file_name_with_new_ext function"""
+
+    NEW_EXT = "cs"
+    FILENAME = "TestFileNAME.txt"
+    FILENAME_SPLITEXT = ["TestFileNAME", ".txt"]
+
+    def setUpClass():
+        print("\nTesting renaming -> get_file_name_with_new_ext()\n")
+
+
+    def test_ext(self):
+        """get_file_name_with_new_ext should return the provided filename with the new extension"""
+
+        with patch('os.path.splitext', return_value=self.FILENAME_SPLITEXT):
+            value = renaming.get_file_name_with_new_ext(self.FILENAME, self.NEW_EXT)
+            expected = "{0}.{1}".format(self.FILENAME_SPLITEXT[0], self.NEW_EXT)
+
+            self.assertEqual(expected, value)
+
+
+    def test_no_dot(self):
+        """get_file_name_with_new_ext should remove any dots from the extension"""
+
+        dot_ext = ".cs"
+
+        with patch('os.path.splitext', return_value=self.FILENAME_SPLITEXT):
+            value = renaming.get_file_name_with_new_ext(self.FILENAME, dot_ext)
+            expected = "{0}{1}".format(self.FILENAME_SPLITEXT[0], dot_ext)
+
+            self.assertEqual(value, expected)
+
+
+    def test_type(self):
+        """get_file_name_with_new_ext should return a string"""
+
+        with patch('os.path.splitext', return_value=self.FILENAME_SPLITEXT):
+            value = renaming.get_file_name_with_new_ext(self.FILENAME, self.NEW_EXT)
+            self.assertIs(str, type(value))
+
+
 class TestGetPreviewFilename(TestCase):
     """Test cases for get_preview_file_name function"""
 
@@ -233,6 +274,8 @@ class TestRenameNonRecursive(TestCase):
         prefix = "PRE_"
         add_suffix = True
         suffix = "_SUFF"
+        change_ext = True
+        new_ext = "abc"
         rename = True
         old_name = "Old"
         new_name = "New"
@@ -240,11 +283,13 @@ class TestRenameNonRecursive(TestCase):
         with patch('app.lib.renaming.full_rename', return_value=self.NEW_NAME) as mock_full_rename:
             renaming.rename_non_recursive(path, add_prefix=add_prefix, prefix=prefix,
                                           add_suffix=add_suffix, suffix=suffix,
+                                          change_ext=change_ext, new_ext=new_ext,
                                           rename=rename, old_name=old_name, new_name=new_name)
 
             self.assertTrue(mock_full_rename.called)
             mock_full_rename.assert_called_with(self.FILES[1], add_prefix=add_prefix, prefix=prefix,
                                                 add_suffix=add_suffix, suffix=suffix,
+                                                change_ext=change_ext, new_ext=new_ext,
                                                 rename=rename, old_name=old_name, new_name=new_name)
 
 
@@ -306,6 +351,8 @@ class TestRenameRecursive(TestCase):
         prefix = "PRE_"
         add_suffix = True
         suffix = "_SUFF"
+        change_ext = True
+        new_ext = "abc"
         rename = True
         old_name = "Old"
         new_name = "New"
@@ -313,11 +360,13 @@ class TestRenameRecursive(TestCase):
         with patch('app.lib.renaming.full_rename', return_value=self.NEW_NAME) as mock_full_rename:
             renaming.rename_recursive(path, add_prefix=add_prefix, prefix=prefix,
                                       add_suffix=add_suffix, suffix=suffix,
+                                      change_ext=change_ext, new_ext=new_ext,
                                       rename=rename, old_name=old_name, new_name=new_name)
 
             self.assertTrue(mock_full_rename.called)
             mock_full_rename.assert_called_with(self.FILES[0], add_prefix=add_prefix, prefix=prefix,
                                                 add_suffix=add_suffix, suffix=suffix,
+                                                change_ext=change_ext, new_ext=new_ext,
                                                 rename=rename, old_name=old_name, new_name=new_name)
 
 

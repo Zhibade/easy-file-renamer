@@ -23,6 +23,7 @@ class FileRenameWorker(QThread):
     def __init__(self, path, parent=None,
                  add_prefix=False, prefix="",
                  add_suffix=False, suffix="",
+                 change_ext=False, new_ext="",
                  replace_name=False, old_name="", new_name="",
                  include_subdir=False):
         super(FileRenameWorker, self).__init__(parent)
@@ -33,6 +34,9 @@ class FileRenameWorker(QThread):
 
         self.add_suffix = add_suffix
         self.suffix = suffix
+
+        self.change_ext = change_ext
+        self.new_ext = new_ext
 
         self.old_name = old_name
         self.new_name = new_name
@@ -49,13 +53,15 @@ class FileRenameWorker(QThread):
 
             if self.include_subdir:
                 rename_recursive(self.path, add_prefix=self.add_prefix, prefix=self.prefix,
-                                 add_suffix=self.add_suffix, suffix=self.suffix, rename=self.rename,
-                                 old_name=self.old_name, new_name=self.new_name)
+                                 add_suffix=self.add_suffix, suffix=self.suffix,
+                                 change_ext=self.change_ext, new_ext=self.new_ext,
+                                 rename=self.rename, old_name=self.old_name, new_name=self.new_name)
 
             else:
                 rename_non_recursive(self.path, add_prefix=self.add_prefix, prefix=self.prefix,
-                                     add_suffix=self.add_suffix, suffix=self.suffix, rename=self.rename,
-                                     old_name=self.old_name, new_name=self.new_name)
+                                     add_suffix=self.add_suffix, suffix=self.suffix,
+                                     change_ext=self.change_ext, new_ext=self.new_ext,
+                                     rename=self.rename, old_name=self.old_name, new_name=self.new_name)
 
         except OSError as error:
             logging.error("An error occurred while renaming: %s", error)
@@ -67,6 +73,7 @@ class FileRenameWorker(QThread):
 def full_rename(filename,
                 add_prefix=False, prefix="",
                 add_suffix=False, suffix="",
+                change_ext=False, new_ext="",
                 rename=False, old_name="", new_name=""):
     """
     Does full renaming process (prefix, suffix, rename, extension)
@@ -85,6 +92,9 @@ def full_rename(filename,
 
     if add_suffix:
         new_filename = get_file_name_with_suffix(new_filename, suffix)
+
+    if change_ext:
+        new_filename = get_file_name_with_new_ext(new_filename, new_ext)
 
     return new_filename
 
@@ -126,10 +136,23 @@ def get_file_name_with_suffix(filename, suffix):
     return new_name
 
 
+def get_file_name_with_new_ext(filename, new_ext):
+    """
+    Returns the new file name by replacing the extension with [new_ext]
+    """
+
+    ext_split = os.path.splitext(filename)
+
+    new_name = "{0}.{1}".format(ext_split[0], new_ext.replace(".", ""))
+
+    return new_name
+
+
 cached_filename = ""
 def get_preview_file_name(path,
                           add_prefix=False, prefix="",
                           add_suffix=False, suffix="",
+                          change_ext=False, new_ext="",
                           rename=False, old_name="", new_name="",
                           get_new=False, include_subdir=False):
     """
@@ -153,6 +176,7 @@ def get_preview_file_name(path,
         return full_rename(cached_filename,
                            add_prefix=add_prefix, prefix=prefix,
                            add_suffix=add_suffix, suffix=suffix,
+                           change_ext=change_ext, new_ext=new_ext,
                            rename=rename, old_name=old_name, new_name=new_name)
 
     rand_filename = get_random_filename_in_dir(norm_path, include_subdir=include_subdir)
@@ -163,6 +187,7 @@ def get_preview_file_name(path,
     filename = full_rename(rand_filename,
                            add_prefix=add_prefix, prefix=prefix,
                            add_suffix=add_suffix, suffix=suffix,
+                           change_ext=change_ext, new_ext=new_ext,
                            rename=rename, old_name=old_name, new_name=new_name)
     cached_filename = filename
 
@@ -172,6 +197,7 @@ def get_preview_file_name(path,
 def rename_recursive(path,
                      add_prefix=False, prefix="",
                      add_suffix=False, suffix="",
+                     change_ext=False, new_ext="",
                      rename=False, old_name="", new_name=""):
     """Renames all files in a directory (recursive) with the provided arguments"""
 
@@ -189,6 +215,7 @@ def rename_recursive(path,
         final_name = full_rename(file_name,
                                  add_prefix=add_prefix, prefix=prefix,
                                  add_suffix=add_suffix, suffix=suffix,
+                                 change_ext=change_ext, new_ext=new_ext,
                                  rename=rename, old_name=old_name, new_name=new_name)
 
         os.rename(full_path, os.path.join(file_dir, final_name))
@@ -200,6 +227,7 @@ def rename_recursive(path,
 def rename_non_recursive(path,
                          add_prefix=False, prefix="",
                          add_suffix=False, suffix="",
+                         change_ext=False, new_ext="",
                          rename=False, old_name="", new_name=""):
     """Renames all files in a directory (non-recursive) with the provided arguments"""
 
@@ -213,6 +241,7 @@ def rename_non_recursive(path,
             final_name = full_rename(dir_element,
                                      add_prefix=add_prefix, prefix=prefix,
                                      add_suffix=add_suffix, suffix=suffix,
+                                     change_ext=change_ext, new_ext=new_ext,
                                      rename=rename, old_name=old_name, new_name=new_name)
 
             os.rename(full_path, os.path.join(norm_path, final_name))

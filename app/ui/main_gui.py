@@ -95,6 +95,9 @@ class GUI(QDialog, UIMainDialog):
         should_add_suffix = self.suff_chk.isChecked()
         suffix = self.suff_line_edit.text()
 
+        change_ext = self.ext_chk.isChecked()
+        new_ext = self.ext_line_edit.text()
+
         should_rename = self.rename_chk.isChecked()
         old_name = self.rename_old_line_edit.text()
         new_name = self.rename_new_line_edit.text()
@@ -104,6 +107,7 @@ class GUI(QDialog, UIMainDialog):
         self.file_renamer_worker = FileRenameWorker(path,
                                                     add_prefix=should_add_prefix, prefix=prefix,
                                                     add_suffix=should_add_suffix, suffix=suffix,
+                                                    change_ext=change_ext, new_ext=new_ext,
                                                     replace_name=should_rename, old_name=old_name, new_name=new_name,
                                                     include_subdir=include_subdir)
         self.file_renamer_worker.aborted.connect(self.renaming_aborted)
@@ -130,6 +134,7 @@ class GUI(QDialog, UIMainDialog):
         self.target_path_line_edit.textChanged.connect(lambda: self.update_preview_label(force_new=True))
         self.prefix_line_edit.textChanged.connect(lambda: self.update_preview_label())
         self.suff_line_edit.textChanged.connect(lambda: self.update_preview_label())
+        self.ext_line_edit.textChanged.connect(lambda: self.update_preview_label())
         self.rename_old_line_edit.textChanged.connect(lambda: self.update_preview_label())
         self.rename_new_line_edit.textChanged.connect(lambda: self.update_preview_label())
 
@@ -202,6 +207,9 @@ class GUI(QDialog, UIMainDialog):
         should_add_suffix = self.suff_chk.isChecked()
         suffix = self.suff_line_edit.text()
 
+        change_ext = self.ext_chk.isChecked()
+        new_ext = self.ext_line_edit.text()
+
         should_rename = self.rename_chk.isChecked()
         old_name = self.rename_old_line_edit.text()
         new_name = self.rename_new_line_edit.text()
@@ -211,6 +219,7 @@ class GUI(QDialog, UIMainDialog):
         preview_filename = get_preview_file_name(path,
                                                  add_prefix=should_add_prefix, prefix=prefix,
                                                  add_suffix=should_add_suffix, suffix=suffix,
+                                                 change_ext=change_ext, new_ext=new_ext,
                                                  rename=should_rename, old_name=old_name, new_name=new_name,
                                                  get_new=force_new, include_subdir=include_subdir)
 
