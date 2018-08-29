@@ -205,4 +205,149 @@ class TestGetPreviewFilename(TestCase):
 
         value = renaming.get_preview_file_name(self.PATH, rename=True, old_name="", new_name="")
         self.assertEqual("NewName.png", value)
-            
+
+
+class TestRenameNonRecursive(TestCase):
+    """Test cases for rename_non_recursive function"""
+
+    PATH = "norm//path"
+    FILES = ["file1.png", "file2.png"]
+    JOIN_PATH = "{0}{1}".format(PATH, FILES[0])
+    NEW_NAME = "newFile1.png"
+
+    def setUpClass():
+        print("\nTesting renaming -> rename_non_recursive()\n")
+
+
+    @patch('os.path.normpath', MagicMock(return_value=PATH))
+    @patch('os.listdir', MagicMock(return_value=FILES))
+    @patch('os.path.join', MagicMock(return_value=JOIN_PATH))
+    @patch('os.path.isfile', MagicMock(return_value=True))
+    @patch('os.rename')
+    @patch('logging.info')
+    def test_args(self, mock_a, mock_b):
+        """rename_non_recursive should pass all of its keyword arguments to [full_rename] function"""
+
+        path = self.PATH
+        add_prefix = True
+        prefix = "PRE_"
+        add_suffix = True
+        suffix = "_SUFF"
+        rename = True
+        old_name = "Old"
+        new_name = "New"
+
+        with patch('app.lib.renaming.full_rename', return_value=self.NEW_NAME) as mock_full_rename:
+            renaming.rename_non_recursive(path, add_prefix=add_prefix, prefix=prefix,
+                                          add_suffix=add_suffix, suffix=suffix,
+                                          rename=rename, old_name=old_name, new_name=new_name)
+
+            self.assertTrue(mock_full_rename.called)
+            mock_full_rename.assert_called_with(self.FILES[1], add_prefix=add_prefix, prefix=prefix,
+                                                add_suffix=add_suffix, suffix=suffix,
+                                                rename=rename, old_name=old_name, new_name=new_name)
+
+
+    @patch('os.path.normpath', MagicMock(return_value=PATH))
+    @patch('os.path.join', MagicMock(return_value=JOIN_PATH))
+    @patch('os.path.isfile', MagicMock(return_value=True))
+    @patch('app.lib.renaming.full_rename', MagicMock(return_value=NEW_NAME))
+    @patch('os.rename')
+    @patch('logging.info')
+    def test_no_subdir(self, mock_a, mock_b):
+        """rename_non_recursive should not include subdirectories"""
+
+        with patch('os.listdir', return_value=self.FILES) as mock_listdir:
+            renaming.rename_non_recursive("")
+            self.assertTrue(mock_listdir.called)
+
+
+    @patch('os.path.normpath', MagicMock(return_value=PATH))
+    @patch('os.listdir', MagicMock(return_value=FILES))
+    @patch('os.path.join', MagicMock(return_value=JOIN_PATH))
+    @patch('os.path.isfile', MagicMock(return_value=True))
+    @patch('app.lib.renaming.full_rename', MagicMock(return_value=NEW_NAME))
+    @patch('logging.info')
+    def test_rename(self, mock_a):
+        """rename_non_recursive should rename the all the files"""
+
+        with patch('os.rename') as mock_rename:
+            renaming.rename_non_recursive("")
+
+            self.assertTrue(mock_rename.called)
+            self.assertTrue(mock_rename.call_count, len(self.FILES))
+
+
+class TestRenameRecursive(TestCase):
+    """Test cases for rename_recursive function"""
+
+    PATH = "norm//path"
+    FILES = ["file1.png", "file2.png"]
+    JOIN_PATH = "{0}{1}".format(PATH, FILES[0])
+    NEW_NAME = "newFile1.png"
+    WALK_DIR_TREE = [("path", "dir", "file"), ("path2", "dir2", "file2")]
+
+    def setUpClass():
+        print("\nTesting renaming -> rename_recursive()\n")
+
+
+    @patch('os.path.normpath', MagicMock(return_value=PATH))
+    @patch('os.walk', MagicMock(return_value=WALK_DIR_TREE))
+    @patch('os.path.join', MagicMock(return_value=JOIN_PATH))
+    @patch('os.path.dirname', MagicMock(return_value=PATH))
+    @patch('os.path.basename', MagicMock(return_value=FILES[0]))
+    @patch('os.rename')
+    @patch('logging.info')
+    def test_args(self, mock_a, mock_b):
+        """rename_recursive should pass all of its keyword arguments to [full_rename] function"""
+
+        path = self.PATH
+        add_prefix = True
+        prefix = "PRE_"
+        add_suffix = True
+        suffix = "_SUFF"
+        rename = True
+        old_name = "Old"
+        new_name = "New"
+
+        with patch('app.lib.renaming.full_rename', return_value=self.NEW_NAME) as mock_full_rename:
+            renaming.rename_recursive(path, add_prefix=add_prefix, prefix=prefix,
+                                      add_suffix=add_suffix, suffix=suffix,
+                                      rename=rename, old_name=old_name, new_name=new_name)
+
+            self.assertTrue(mock_full_rename.called)
+            mock_full_rename.assert_called_with(self.FILES[0], add_prefix=add_prefix, prefix=prefix,
+                                                add_suffix=add_suffix, suffix=suffix,
+                                                rename=rename, old_name=old_name, new_name=new_name)
+
+
+    @patch('os.path.normpath', MagicMock(return_value=PATH))
+    @patch('os.path.join', MagicMock(return_value=JOIN_PATH))
+    @patch('os.path.dirname', MagicMock(return_value=PATH))
+    @patch('os.path.basename', MagicMock(return_value=FILES[0]))
+    @patch('app.lib.renaming.full_rename', MagicMock(return_value=NEW_NAME))
+    @patch('os.rename')
+    @patch('logging.info')
+    def test_no_subdir(self, mock_a, mock_b):
+        """rename_recursive should include subdirectories"""
+
+        with patch('os.walk', return_value=self.WALK_DIR_TREE) as mock_walk:
+            renaming.rename_recursive("")
+            self.assertTrue(mock_walk.called)
+
+
+    @patch('os.path.normpath', MagicMock(return_value=PATH))
+    @patch('os.walk', MagicMock(return_value=WALK_DIR_TREE))
+    @patch('os.path.join', MagicMock(return_value=JOIN_PATH))
+    @patch('os.path.dirname', MagicMock(return_value=PATH))
+    @patch('os.path.basename', MagicMock(return_value=FILES[0]))
+    @patch('app.lib.renaming.full_rename', MagicMock(return_value=NEW_NAME))
+    @patch('logging.info')
+    def test_rename(self, mock_a):
+        """rename_recursive should rename the all the files"""
+
+        with patch('os.rename', return_value=self.FILES) as mock_rename:
+            renaming.rename_recursive("")
+
+            self.assertTrue(mock_rename.called)
+            self.assertTrue(mock_rename.call_count, len(self.WALK_DIR_TREE))

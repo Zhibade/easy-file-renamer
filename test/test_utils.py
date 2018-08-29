@@ -82,10 +82,11 @@ class TestGetRandomFilenameInDir(TestCase):
         filename = "file.png"
 
         with patch('os.path.exists', return_value=True):
-            with patch('os.listdir', return_value=[filename, filename]):
-                with patch('os.path.isfile', return_value=True):
-                    value = utils.get_random_filename_in_dir("some/path")
-                    self.assertEqual(filename, value)
+            with patch('os.walk', return_value=[("root", "dir", "file")]):
+                with patch('os.listdir', return_value=[filename, filename]):
+                    with patch('os.path.isfile', return_value=True):
+                        value = utils.get_random_filename_in_dir("some/path")
+                        self.assertEqual(filename, value)
 
 
     def test_invalid(self):
@@ -94,3 +95,29 @@ class TestGetRandomFilenameInDir(TestCase):
         with patch('os.path.exists', return_value=False):
             value = utils.get_random_filename_in_dir("some/path")
             self.assertEqual("", value)
+
+
+    def test_no_subdir(self):
+        """get_random_filename_in_dir should not include subdirectories if [include_subdir] is False"""
+
+        folder = "folder"
+
+        with patch('os.path.exists', return_value=True):
+            with patch('os.walk', return_value=[("root", "dir", "file")]) as walk_mock:
+                with patch('os.listdir', return_value=[folder, folder]):
+                    with patch('os.path.isfile', return_value=True):
+                        utils.get_random_filename_in_dir("some/path")
+                        self.assertEqual(walk_mock.called, False)
+
+
+    def test_subdir(self):
+        """get_random_filename_in_dir should include subdirectories if [include_subdir] is True"""
+
+        folder = "folder"
+
+        with patch('os.path.exists', return_value=True):
+            with patch('os.walk', return_value=[("root", "dir", "file")]) as walk_mock:
+                with patch('os.listdir', return_value=[folder, folder]):
+                    with patch('os.path.isfile', return_value=True):
+                        utils.get_random_filename_in_dir("some/path", include_subdir=True)
+                        self.assertEqual(walk_mock.called, True)

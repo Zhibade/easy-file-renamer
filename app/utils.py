@@ -23,18 +23,28 @@ def get_file_text(path):
     return contents
 
 
-def get_random_filename_in_dir(path):
+def get_random_filename_in_dir(path, include_subdir=False):
     """Returns the filename of a random file in the path"""
 
     if not os.path.exists(path):
         return ""
 
-    dir_elements = os.listdir(path)
+    dir_elements = []
 
-    is_picking_file = True
+    if include_subdir:
+        for root, dirs, files in os.walk(path):
+            for filename in files:
+                dir_elements.append(filename)
 
-    while is_picking_file:
-        picked_file = random.choice(dir_elements)
+        return random.choice(dir_elements)
 
-        if os.path.isfile(os.path.join(path, picked_file)):
-            return picked_file
+    else:
+        dir_elements = os.listdir(path)
+
+        is_picking_file = True
+
+        while is_picking_file:
+            picked_file = random.choice(dir_elements)
+
+            if os.path.isfile(os.path.join(path, picked_file)):
+                return picked_file

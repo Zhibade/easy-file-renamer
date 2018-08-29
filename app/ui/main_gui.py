@@ -99,10 +99,13 @@ class GUI(QDialog, UIMainDialog):
         old_name = self.rename_old_line_edit.text()
         new_name = self.rename_new_line_edit.text()
 
+        include_subdir = self.include_subdir_chk.isChecked()
+
         self.file_renamer_worker = FileRenameWorker(path,
                                                     add_prefix=should_add_prefix, prefix=prefix,
                                                     add_suffix=should_add_suffix, suffix=suffix,
-                                                    replace_name=should_rename, old_name=old_name, new_name=new_name)
+                                                    replace_name=should_rename, old_name=old_name, new_name=new_name,
+                                                    include_subdir=include_subdir)
         self.file_renamer_worker.aborted.connect(self.renaming_aborted)
         self.file_renamer_worker.finished.connect(self.renaming_finished)
 
@@ -203,10 +206,12 @@ class GUI(QDialog, UIMainDialog):
         old_name = self.rename_old_line_edit.text()
         new_name = self.rename_new_line_edit.text()
 
+        include_subdir = self.include_subdir_chk.isChecked()
+
         preview_filename = get_preview_file_name(path,
                                                  add_prefix=should_add_prefix, prefix=prefix,
                                                  add_suffix=should_add_suffix, suffix=suffix,
                                                  rename=should_rename, old_name=old_name, new_name=new_name,
-                                                 get_new=force_new)
+                                                 get_new=force_new, include_subdir=include_subdir)
 
         self.prev_file_name_label.setText(preview_filename)

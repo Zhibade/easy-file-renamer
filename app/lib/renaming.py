@@ -23,7 +23,8 @@ class FileRenameWorker(QThread):
     def __init__(self, path, parent=None,
                  add_prefix=False, prefix="",
                  add_suffix=False, suffix="",
-                 replace_name=False, old_name="", new_name=""):
+                 replace_name=False, old_name="", new_name="",
+                 include_subdir=False):
         super(FileRenameWorker, self).__init__(parent)
         self.path = path
 
@@ -37,29 +38,24 @@ class FileRenameWorker(QThread):
         self.new_name = new_name
         self.rename = replace_name
 
+        self.include_subdir = include_subdir
+
 
     def run(self):
         """Overriding run method with custom logic"""
 
         try:
-            norm_path = os.path.normpath(self.path)
-            logging.info("Starting renaming on path: %s", norm_path)
+            logging.info("Starting renaming on path: %s", self.path)
 
-            all_in_dir = os.listdir(norm_path)
+            if self.include_subdir:
+                rename_recursive(self.path, add_prefix=self.add_prefix, prefix=self.prefix,
+                                 add_suffix=self.add_suffix, suffix=self.suffix, rename=self.rename,
+                                 old_name=self.old_name, new_name=self.new_name)
 
-            for dir_element in all_in_dir:
-                full_path = os.path.join(norm_path, dir_element)
-
-                if os.path.isfile(full_path):
-                    file_name = os.path.basename(full_path)
-                    final_name = full_rename(file_name,
-                                             add_prefix=self.add_prefix, prefix=self.prefix,
-                                             add_suffix=self.add_suffix, suffix=self.suffix,
-                                             rename=self.rename, old_name=self.old_name, new_name=self.new_name)
-
-                    os.rename(full_path, os.path.join(norm_path, final_name))
-
-                    logging.info("Renamed [%s] to [%s]", dir_element, final_name)
+            else:
+                rename_non_recursive(self.path, add_prefix=self.add_prefix, prefix=self.prefix,
+                                     add_suffix=self.add_suffix, suffix=self.suffix, rename=self.rename,
+                                     old_name=self.old_name, new_name=self.new_name)
 
         except OSError as error:
             logging.error("An error occurred while renaming: %s", error)
@@ -134,7 +130,8 @@ cached_filename = ""
 def get_preview_file_name(path,
                           add_prefix=False, prefix="",
                           add_suffix=False, suffix="",
-                          rename=False, old_name="", new_name="", get_new=False):
+                          rename=False, old_name="", new_name="",
+                          get_new=False, include_subdir=False):
     """
     Returns preview filename. When called for the first time it uses a random filename in
     the provided path and cache it. Every time after that it will use the cached filename
@@ -158,7 +155,7 @@ def get_preview_file_name(path,
                            add_suffix=add_suffix, suffix=suffix,
                            rename=rename, old_name=old_name, new_name=new_name)
 
-    rand_filename = get_random_filename_in_dir(norm_path)
+    rand_filename = get_random_filename_in_dir(norm_path, include_subdir=include_subdir)
 
     if rand_filename is None:
         return "No files found"
@@ -170,3 +167,54 @@ def get_preview_file_name(path,
     cached_filename = filename
 
     return filename
+
+
+def rename_recursive(path,
+                     add_prefix=False, prefix="",
+                     add_suffix=False, suffix="",
+                     rename=False, old_name="", new_name=""):
+    """Renames all files in a directory (recursive) with the provided arguments"""
+
+    norm_path = os.path.normpath(path)
+    all_in_tree = []
+
+    for root, dirs, files in os.walk(norm_path):
+        for filename in files:
+            all_in_tree.append(os.path.join(root, filename))
+
+    for full_path in all_in_tree:
+        file_dir = os.path.dirname(full_path)
+        file_name = os.path.basename(full_path)
+
+        final_name = full_rename(file_name,
+                                 add_prefix=add_prefix, prefix=prefix,
+                                 add_suffix=add_suffix, suffix=suffix,
+                                 rename=rename, old_name=old_name, new_name=new_name)
+
+        os.rename(full_path, os.path.join(file_dir, final_name))
+
+        logging.info("Renamed [%s] to [%s]", file_name, final_name)
+
+
+
+def rename_non_recursive(path,
+                         add_prefix=False, prefix="",
+                         add_suffix=False, suffix="",
+                         rename=False, old_name="", new_name=""):
+    """Renames all files in a directory (non-recursive) with the provided arguments"""
+
+    norm_path = os.path.normpath(path)
+    all_in_dir = os.listdir(norm_path)
+
+    for dir_element in all_in_dir:
+        full_path = os.path.join(norm_path, dir_element)
+
+        if os.path.isfile(full_path):
+            final_name = full_rename(dir_element,
+                                     add_prefix=add_prefix, prefix=prefix,
+                                     add_suffix=add_suffix, suffix=suffix,
+                                     rename=rename, old_name=old_name, new_name=new_name)
+
+            os.rename(full_path, os.path.join(norm_path, final_name))
+
+            logging.info("Renamed [%s] to [%s]", dir_element, final_name)
